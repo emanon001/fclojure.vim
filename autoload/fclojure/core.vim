@@ -70,7 +70,8 @@ let s:problem_list = []
 let s:problem_detail_table = {}
 let s:problem_list_bufnr = -1
 let s:curl_command = fclojure#option#get('curl_command')
-let s:data_dir = s:F.remove_last_separator(expand(fclojure#option#get('data_dir')))
+let s:data_dir = s:F.remove_last_separator(
+      \ fnamemodify(expand(fclojure#option#get('data_dir')), ':p'))
 
 
 
