@@ -52,7 +52,7 @@ function! fclojure#option#init() " {{{2
   call s:set_option('curl_command',
         \ get(user_option_table, 'curl_command', 'curl'))
   call s:set_option('data_dir',
-        \ get(user_option_table, 'data_dir', expand('~/.fclojure')))
+        \ get(user_option_table, 'data_dir', '~/.fclojure'))
   call s:set_option('open_command',
         \ get(user_option_table, 'open_command', 'split'))
   call s:set_option('no_default_key_mappings',

@@ -70,7 +70,7 @@ let s:problem_list = []
 let s:problem_detail_table = {}
 let s:problem_list_bufnr = -1
 let s:curl_command = fclojure#option#get('curl_command')
-let s:data_dir = s:F.remove_last_separator(fclojure#option#get('data_dir'))
+let s:data_dir = s:F.remove_last_separator(expand(fclojure#option#get('data_dir')))
 
 
 
@@ -196,9 +196,10 @@ function! s:log_in_by_user_input() " {{{2
   " Note: Using Vital.Web.Http.post(), implicit redirect is performed.
   "       *log-in url* -> [problem-list url] or [log-in url]
   "       *log-in url* response is required.
-  let command = printf('%s %s -s -k -i -d user=%s -d pwd=%s -c %s',
+  let command = printf('%s %s -s -k -i -d user=%s -d pwd=%s -c "%s"',
         \              s:curl_command, s:get_url('log_in'),
-        \              user_name, password, s:get_file_path('cookie'))
+        \              user_name, password,
+        \              escape(s:get_file_path('cookie'), '"'))
   " Response is only a header.
   let header = s:V.system(command)
   if header =~# 'Location: /problems'
