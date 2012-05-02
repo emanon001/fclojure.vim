@@ -272,9 +272,21 @@ endfunction
 function! s:callback_of_solve(problem_no, result) " {{{2
   if strchars(a:result.message) > 0
     " Success is resolving.
-    let s:problem_list[a:problem_no - 1].is_solved = s:TRUE
+    let problem = s:get_problem_from_problem_list(a:problem_no)
+    let problem.is_solved = s:TRUE
   endif
 endfunction
+
+function! s:get_problem_from_problem_list(problem_no)"{{{
+  for p in s:problem_list
+    if p.no == a:problem_no
+      return p
+    endif
+  endfor
+  throw fclojure#util#create_exception('IllegalArgument',
+          \ printf('Problem No."%d" doesn''t exist.', a:problem_no))
+endfunction
+"}}}
 
 
 
