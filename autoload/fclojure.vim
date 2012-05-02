@@ -27,11 +27,18 @@ lockvar! s:PLUGIN_NAME
 
 
 
+" Variables {{{1
+
+let s:callbacks_of_solve = []
+
+
+
+
 " Interface {{{1
 
-function! fclojure#open_problem_list() " {{{2
+function! fclojure#open_problem_list(use_cache) " {{{2
   try
-    let problem_list = fclojure#core#get_problem_list()
+    let problem_list = fclojure#core#get_problem_list(a:use_cache)
   catch /^fclojure:/
     call fclojure#util#print_error(v:exception)
     return
@@ -40,9 +47,9 @@ function! fclojure#open_problem_list() " {{{2
 endfunction
 
 
-function! fclojure#open_problem(problem_no) " {{{2
+function! fclojure#open_problem(problem_no, use_cache) " {{{2
   try
-    let problem = fclojure#core#get_problem(a:problem_no)
+    let problem = fclojure#core#get_problem(a:problem_no, a:use_cache)
   catch /^fclojure:/
     call fclojure#util#print_error(v:exception)
     return
@@ -51,10 +58,19 @@ function! fclojure#open_problem(problem_no) " {{{2
 endfunction
 
 
-function! fclojure#solve_problem(problem_no, answer, ...) " {{{2
-  let F = get(a:000, 0, function('s:default_callback_of_solve'))
+function! fclojure#solve_problem(problem_no, answer) " {{{2
   let result = fclojure#core#solve_problem(a:problem_no, a:answer)
-  call F(a:problem_no, result)
+  call s:notify_callbacks(a:problem_no, result)
+endfunction
+
+
+function! fclojure#add_callback_of_solve(callback) " {{{2
+  call add(s:callbacks_of_solve, a:callback)
+endfunction
+
+
+function! fclojure#delete_callback_of_solve(callback) " {{{2
+  call filter(s:callbacks_of_solve, 'v:val != a:callback')
 endfunction
 
 
@@ -67,8 +83,10 @@ endfunction
 
 " Core {{{1
 
-function! s:default_callback_of_solve(problem_no, result) " {{{2
-  call fclojure#viewer#notify_result_of_solve(a:problem_no, a:result)
+function! s:notify_callbacks(...) " {{{2
+  for C in s:callbacks_of_solve
+    call call(C, a:000)
+  endfor
 endfunction
 
 

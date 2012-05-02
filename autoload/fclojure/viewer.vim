@@ -75,22 +75,11 @@ function! fclojure#viewer#open_answer_column(problem_no) " {{{2
 endfunction
 
 
-function! fclojure#viewer#notify_result_of_solve(problem_no, result) " {{{2
-  let bufnr = get(get(s:problem_view_table, a:problem_no, {}), 'bufnr', -1)
-  if !bufexists(bufnr)
-    throw fclojure#util#create_exception('IllegalState',
-          \ printf('Problem No.%s hasn''t been opened.', a:problem_no)
-  endif
-  call s:set_result_message_in_problem_buffer(a:problem_no, a:result)
-  call s:sign_place_in_problem_buffer(a:problem_no, a:result)
-endfunction
-
-
 " Key mappings {{{2
 
 
 nnoremap <silent> <Plug>(fclojure-select-problem)
-      \ :<C-u>call fclojure#open_problem(str2nr(matchstr(getline('.'), '^#\zs\d\+')))<CR>
+      \ :<C-u>call fclojure#open_problem(str2nr(matchstr(getline('.'), '^#\zs\d\+')), 1)<CR>
 
 nnoremap <silent> <Plug>(fclojure-quit-problem-list)
       \ :<C-u>quit<CR>
@@ -260,44 +249,6 @@ endfunction
 "}}}
 
 
-function! s:set_result_message_in_problem_buffer(problem_no, result) " {{{2
-  let info = s:problem_view_table[a:problem_no]
-  let signs = info.signs
-  let message = strchars(a:result.message) > 0 ? a:result.message
-        \                                      : a:result.error
-  call s:move_to_buffer(info.bufnr)
-  let lines = getline(1, signs.result_message - 1)
-  let lines += ['']
-  let lines += [repeat('*', s:MAX_LINE_LENGTH)]
-  let lines += fclojure#util#split_by_length(message, s:MAX_LINE_LENGTH)
-  let lines += [repeat('*', s:MAX_LINE_LENGTH)]
-  setlocal modifiable noreadonly
-  silent! 1,$delete
-  call setline(1, lines)
-  setlocal nomodifiable readonly
-  silent! wincmd p
-endfunction
-
-
-function! s:sign_place_in_problem_buffer(problem_no, result) " {{{2
-  let info = s:problem_view_table[a:problem_no]
-  let signs = info.signs
-  let failed_test_case_id = 1
-
-  " Unplace the sign.
-  execute printf('sign unplace %d buffer=%d', failed_test_case_id, info.bufnr)
-
-  " failed_test_case_no is 0 origin.
-  let failed_test_case_no = a:result.failed_test_case_no
-  if failed_test_case_no < len(signs.test_cases)
-    " Failed test case.
-    execute printf('sign place %d line=%d name=%s buffer=%d',
-          \        failed_test_case_id, signs.test_cases[failed_test_case_no],
-          \        'fclojure-failed-test-case', info.bufnr)
-  endif
-endfunction
-
-
 function! s:create_buffer(bufname, setter) " {{{2
   let open_command = fclojure#option#get('open_command')
   execute open_command
@@ -327,11 +278,81 @@ endfunction
 
 
 
+function! s:callback_of_solve(problem_no, result) " {{{2
+  let bufnr = get(get(s:problem_view_table, a:problem_no, {}), 'bufnr', -1)
+  if !bufexists(bufnr)
+    throw fclojure#util#create_exception('IllegalState',
+          \ printf('Problem No.%s hasn''t been opened.', a:problem_no)
+  endif
+  call s:set_result_message_in_problem_buffer(a:problem_no, a:result)
+  call s:sign_place_in_problem_buffer(a:problem_no, a:result)
+endfunction
+
+function! s:set_result_message_in_problem_buffer(problem_no, result)"{{{
+  let info = s:problem_view_table[a:problem_no]
+  let signs = info.signs
+  let message = strchars(a:result.message) > 0 ? a:result.message
+        \                                      : a:result.error
+  call s:move_to_buffer(info.bufnr)
+  let lines = getline(1, signs.result_message - 1)
+  let lines += ['']
+  let lines += [repeat('*', s:MAX_LINE_LENGTH)]
+  let lines += fclojure#util#split_by_length(message, s:MAX_LINE_LENGTH)
+  let lines += [repeat('*', s:MAX_LINE_LENGTH)]
+  setlocal modifiable noreadonly
+  silent! 1,$delete
+  call setline(1, lines)
+  setlocal nomodifiable readonly
+  silent! wincmd p
+endfunction
+"}}}
+
+function! s:sign_place_in_problem_buffer(problem_no, result)"{{{
+  let info = s:problem_view_table[a:problem_no]
+  let signs = info.signs
+  let failed_test_case_id = 1
+
+  " Unplace the sign.
+  execute printf('sign unplace %d buffer=%d', failed_test_case_id, info.bufnr)
+
+  " failed_test_case_no is 0 origin.
+  let failed_test_case_no = a:result.failed_test_case_no
+  if failed_test_case_no < len(signs.test_cases)
+    " Failed test case.
+    execute printf('sign place %d line=%d name=%s buffer=%d',
+          \        failed_test_case_id, signs.test_cases[failed_test_case_no],
+          \        'fclojure-failed-test-case', info.bufnr)
+  endif
+endfunction
+"}}}
+
+
+
+
 " Misc {{{1
 
-function! s:use_default_key_mappings_p()
+function! s:use_default_key_mappings_p() " {{{2
   return fclojure#option#get('no_default_key_mappings') == s:FALSE
 endfunction
+
+
+function! s:snr() " {{{2
+  return str2nr(matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_snr$'))
+endfunction
+
+
+function! s:sid() " {{{2
+  return printf('<SNR>%d_', s:snr())
+endfunction
+
+
+
+
+
+
+" Init {{{1
+
+call fclojure#add_callback_of_solve(function(s:sid() . 'callback_of_solve'))
 
 
 

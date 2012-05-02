@@ -50,7 +50,7 @@ endfunction
 " Core {{{1
 
 function! s:source.gather_candidates(args, context) " {{{2
-  let problem_list = fclojure#core#get_problem_list()
+  let problem_list = fclojure#core#get_problem_list(s:TRUE)
   let max_length_table = fclojure#util#get_problem_item_max_length_table(problem_list)
   return map(copy(problem_list),
         \ '{

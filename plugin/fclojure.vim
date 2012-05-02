@@ -24,11 +24,11 @@ set cpoptions&vim
 
 " Commands {{{1
 
-command! -nargs=0 FClojureOpenProblemList
-      \ call fclojure#open_problem_list()
+command! -nargs=0 -bang FClojureOpenProblemList
+      \ call fclojure#open_problem_list('<bang>' == '')
 
-command! -nargs=1 FClojureOpenProblem
-      \ call fclojure#open_problem(<args>)
+command! -nargs=1 -bang FClojureOpenProblem
+      \ call fclojure#open_problem(<args>, '<bang>' == '')
 
 
 

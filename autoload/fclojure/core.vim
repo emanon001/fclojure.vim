@@ -77,9 +77,9 @@ let s:data_dir = s:F.remove_last_separator(expand(fclojure#option#get('data_dir'
 
 " Interface {{{1
 
-function! fclojure#core#get_problem_list() " {{{2
+function! fclojure#core#get_problem_list(use_cache) " {{{2
   " Use the cache."{{{
-  if !empty(s:problem_list)
+  if a:use_cache && !empty(s:problem_list)
     return s:problem_list
   endif
   "}}}
@@ -98,9 +98,9 @@ function! fclojure#core#get_problem_list() " {{{2
 endfunction
 
 
-function! fclojure#core#get_problem(problem_no) " {{{2
+function! fclojure#core#get_problem(problem_no, use_cache) " {{{2
   " Use cache."{{{
-  if has_key(s:problem_detail_table, a:problem_no)
+  if a:use_cache && has_key(s:problem_detail_table, a:problem_no)
     return s:problem_detail_table[a:problem_no]
   endif
   "}}}
@@ -269,6 +269,14 @@ function! s:write_problem_details_cache(problem_details) " {{{2
 endfunction
 
 
+function! s:callback_of_solve(problem_no, result) " {{{2
+  if strchars(a:result.message) > 0
+    " Success is resolving.
+    let s:problem_list[a:problem_no - 1].is_solved = s:TRUE
+  endif
+endfunction
+
+
 
 
 " Misc {{{1
@@ -309,6 +317,16 @@ function! s:get_solve_url(problem_no) " {{{2
 endfunction
 
 
+function! s:snr() " {{{2
+  return str2nr(matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_snr$'))
+endfunction
+
+
+function! s:sid() " {{{2
+  return printf('<SNR>%d_', s:snr())
+endfunction
+
+
 
 
 " Init {{{1
@@ -321,6 +339,8 @@ augroup fclojure-core
   autocmd VimLeavePre * call s:write_problem_list_cache(s:problem_list) |
         \               call s:write_problem_details_cache(s:problem_detail_table)
 augroup END
+
+call fclojure#add_callback_of_solve(function(s:sid() . 'callback_of_solve'))
 
 
 

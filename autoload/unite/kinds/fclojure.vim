@@ -62,7 +62,7 @@ let s:kind.action_table.open = {
 
 function! s:kind.action_table.open.func(candidates) "{{{
   for c in a:candidates
-    call fclojure#open_problem(c.action__problem_no)
+    call fclojure#open_problem(c.action__problem_no, s:TRUE)
   endfor
 endfunction
 "}}}
