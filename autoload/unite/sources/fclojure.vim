@@ -31,7 +31,6 @@ call fclojure#util#lock_constants(s:)
 
 let s:source = {
       \   'name': 'fclojure',
-      \   'max_candidates': 30,
       \   'description': 'candidates from fclojure problem list',
       \ }
 
