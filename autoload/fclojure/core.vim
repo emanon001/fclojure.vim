@@ -353,7 +353,7 @@ augroup fclojure-core
         \               call s:write_problem_details_cache(s:problem_detail_table)
 augroup END
 
-call fclojure#add_callback_of_solve(function(s:sid() . 'callback_of_solve'))
+call fclojure#add_callback('solve-problem', function(s:sid() . 'callback_of_solve'))
 
 
 

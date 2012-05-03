@@ -29,7 +29,7 @@ lockvar! s:PLUGIN_NAME
 
 " Variables {{{1
 
-let s:callbacks_of_solve = []
+let s:callback_table = {}
 
 
 
@@ -60,17 +60,23 @@ endfunction
 
 function! fclojure#solve_problem(problem_no, answer) " {{{2
   let result = fclojure#core#solve_problem(a:problem_no, a:answer)
-  call s:notify_callbacks(a:problem_no, result)
+  call s:notify_callbacks('solve-problem', a:problem_no, result)
 endfunction
 
 
-function! fclojure#add_callback_of_solve(callback) " {{{2
-  call add(s:callbacks_of_solve, a:callback)
+function! fclojure#add_callback(event, callback) " {{{2
+  if !has_key(s:callback_table, a:event)
+    let s:callback_table[a:event] = []
+  endif
+  call add(s:callback_table[a:event], a:callback)
 endfunction
 
 
-function! fclojure#delete_callback_of_solve(callback) " {{{2
-  call filter(s:callbacks_of_solve, 'v:val != a:callback')
+function! fclojure#delete_callback(event, callback) " {{{2
+  if !has_key(s:callback_table, a:event)
+    return
+  endif
+  call filter(s:callback_table[a:event], 'v:val != a:callback')
 endfunction
 
 
@@ -83,8 +89,11 @@ endfunction
 
 " Core {{{1
 
-function! s:notify_callbacks(...) " {{{2
-  for C in s:callbacks_of_solve
+function! s:notify_callbacks(event, ...) " {{{2
+  if !has_key(s:callback_table, a:event)
+    return
+  endif
+  for C in s:callback_table[a:event]
     call call(C, a:000)
   endfor
 endfunction

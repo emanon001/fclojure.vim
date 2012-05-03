@@ -352,7 +352,7 @@ endfunction
 
 " Init {{{1
 
-call fclojure#add_callback_of_solve(function(s:sid() . 'callback_of_solve'))
+call fclojure#add_callback('solve-problem', function(s:sid() . 'callback_of_solve'))
 
 
 
