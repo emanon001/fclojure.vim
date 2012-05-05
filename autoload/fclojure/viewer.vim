@@ -123,10 +123,8 @@ endfunction
 "}}}
 
 function! s:set_problem_list_buffer_key_mappings() dict "{{{
-  if s:use_default_key_mappings_p()
-    nmap <buffer> o <Plug>(fclojure-select-problem)
-    nmap <buffer> q <Plug>(fclojure-quit-problem-list)
-  endif
+  nmap <buffer> o <Plug>(fclojure-select-problem)
+  nmap <buffer> q <Plug>(fclojure-quit-problem-list)
 endfunction
 "}}}
 
@@ -166,10 +164,8 @@ endfunction
 "}}}
 
 function! s:set_problem_buffer_key_mappings() dict "{{{
-  if s:use_default_key_mappings_p()
-    nmap <buffer> o <Plug>(fclojure-open-answer-column)
-    nmap <buffer> q <Plug>(fclojure-quit-problem)
-  endif
+  nmap <buffer> o <Plug>(fclojure-open-answer-column)
+  nmap <buffer> q <Plug>(fclojure-quit-problem)
 endfunction
 "}}}
 
@@ -241,10 +237,8 @@ endfunction
 "}}}
 
 function! s:set_answer_buffer_key_mappings() dict "{{{
-  if s:use_default_key_mappings_p()
-    nmap <buffer> <LocalLeader>s <Plug>(fclojure-solve-problem-by-answer-column)
-    nmap <buffer> q <Plug>(fclojure-quit-answer-column)
-  endif
+  nmap <buffer> <LocalLeader>s <Plug>(fclojure-solve-problem-by-answer-column)
+  nmap <buffer> q <Plug>(fclojure-quit-answer-column)
 endfunction
 "}}}
 
@@ -254,7 +248,9 @@ function! s:create_buffer(bufname, setter) " {{{2
   execute open_command
   edit `=a:bufname`
   call a:setter.set_options()
-  call a:setter.set_key_mappings()
+  if s:use_default_key_mappings_p()
+    call a:setter.set_key_mappings()
+  endif
 endfunction
 
 
