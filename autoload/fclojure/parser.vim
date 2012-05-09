@@ -82,9 +82,8 @@ function! fclojure#parser#parse_problem(response) " {{{2
   let restrictions_node = s:get_element_by_id(desc_node, 'restrictions')
   let restrictions = []
   if !empty(restrictions_node)
-    let _header = restrictions_node.find('u').value()
-    let _body = map(copy(restrictions_node.findAll('li')), 'v:val.value()')
-    let restrictions = [_header] + _body
+    let restrictions = map(copy(restrictions_node.findAll('li')),
+          \                     'v:val.value()')
   endif
   let problem.restrictions = restrictions
   "}}}

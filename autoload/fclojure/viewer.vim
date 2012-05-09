@@ -191,11 +191,8 @@ function! s:problem_to_lines_info(problem)"{{{
   "}}}
   call add(lines, repeat('-', s:MAX_LINE_LENGTH))
   " Restrictions"{{{
-  if !empty(a:problem.restrictions)
-    let [_header; _body] = a:problem.restrictions
-    call s:add_line(lines, _header, s:MAX_LINE_LENGTH)
-    call s:add_line(lines, join(_body), s:MAX_LINE_LENGTH)
-  endif
+  call s:add_line(lines, 'Special Restrictions', s:MAX_LINE_LENGTH)
+  call s:add_line(lines, join(a:problem.restrictions), s:MAX_LINE_LENGTH)
   "}}}
   call add(lines, repeat('=', s:MAX_LINE_LENGTH))
   " Test cases"{{{
