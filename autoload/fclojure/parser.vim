@@ -75,7 +75,7 @@ function! fclojure#parser#parse_problem(response) " {{{2
   endfor
   "}}}
   " test cases"{{{
-  let test_cases_nodes = s:get_element_by_class(desc_node, 'testcases')[0].findAll('tr')
+  let test_cases_nodes = s:get_elements_by_class(desc_node, 'testcases')[0].findAll('tr')
   let problem.test_cases = map(copy(test_cases_nodes), 'v:val.value()')
   "}}}
   " restrictions"{{{
@@ -158,13 +158,13 @@ endfunction
 
 
 
-function! s:get_element_by_class(node, class) " {{{2
+function! s:get_elements_by_class(node, class) " {{{2
   let elements = []
   for child in a:node.childNodes()
     if has_key(child.attr, 'class') && child.attr.class =~# '\<' . a:class .'\>'
       call add(elements, child)
     else
-      let _ = s:get_element_by_class(child, a:class)
+      let _ = s:get_elements_by_class(child, a:class)
       call extend(elements, _)
     endif
   endfor
