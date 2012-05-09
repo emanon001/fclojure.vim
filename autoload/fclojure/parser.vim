@@ -79,12 +79,12 @@ function! fclojure#parser#parse_problem(response) " {{{2
   let problem.test_cases = map(copy(test_cases_nodes), 'v:val.value()')
   "}}}
   " restrictions"{{{
-  let rest_node = s:get_element_by_id(desc_node, 'restrictions')
+  let restrictions_node = s:get_element_by_id(desc_node, 'restrictions')
   let restrictions = []
-  if !empty(rest_node)
-    let rest_head = rest_node.find('u').value()
-    let restrictions = [rest_head] + map(copy(rest_node.findAll('li')),
-          \                                   'v:val.value()')
+  if !empty(restrictions_node)
+    let _header = restrictions_node.find('u').value()
+    let _body = map(copy(restrictions_node.findAll('li')), 'v:val.value()')
+    let restrictions = [_header] + _body
   endif
   let problem.restrictions = restrictions
   "}}}
