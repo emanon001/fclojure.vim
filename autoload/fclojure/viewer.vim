@@ -85,7 +85,7 @@ nnoremap <silent> <Plug>(fclojure-quit-problem-list)
       \ :<C-u>quit<CR>
 
 nnoremap <silent> <Plug>(fclojure-open-answer-column)
-      \ :<C-u>call fclojure#viewer#open_answer_column(b:fclojure_problem_no)<CR>
+      \ :<C-u>call fclojure#open_answer_column(b:fclojure_problem_no)<CR>
 
 nnoremap <silent> <Plug>(fclojure-quit-problem)
       \ :<C-u>quit<CR>
