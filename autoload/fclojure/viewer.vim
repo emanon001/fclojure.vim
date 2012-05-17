@@ -266,7 +266,7 @@ endfunction
 "}}}
 
 function! s:get_answer_file_path(problem_no)"{{{
-  return printf("%s/%d.clj", fclojure#core#get_file_path('answer_dir'), a:problem_no)
+  return printf("%s/%03d.clj", fclojure#core#get_file_path('answer_dir'), a:problem_no)
 endfunction
 "}}}
 
