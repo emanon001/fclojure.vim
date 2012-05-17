@@ -23,7 +23,7 @@ set cpoptions&vim
 call fclojure#util#define_boolean(s:)
 
 " Vital"{{{
-let s:V = vital#of(fclojure#name())
+let s:V = fclojure#util#vital()
 call s:V.import('Web.Html', s:V)
 call s:V.import('Web.Json', s:V)
 "}}}

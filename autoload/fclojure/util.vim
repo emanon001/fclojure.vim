@@ -21,16 +21,16 @@ set cpoptions&vim
 " Interface {{{1
 
 function! fclojure#util#create_exception(type, message) " {{{2
-  return printf('%s: %s: %s', fclojure#name(), a:type, a:message)
+  return printf('%s: %s: %s', s:PLUGIN_NAME, a:type, a:message)
 endfunction
 
 
 function! fclojure#util#print_error(message) " {{{2
-  let head_messages = [printf('%s: %s', fclojure#name(), 'The error occurred.')]
+  let head_messages = [printf('%s: %s', s:PLUGIN_NAME, 'The error occurred.')]
   let main_messages = type(a:message) == type([]) ? copy(a:message) : [a:message]
   " Remove prefix string of exception.
   call map(main_messages,
-        \  'matchstr(v:val, ''^\%('' . fclojure#name() . '': [^:]*:\)\=\s*\zs.*'')')
+        \  'matchstr(v:val, ''^\%('' . s:PLUGIN_NAME . '': [^:]*:\)\=\s*\zs.*'')')
 
   echohl ErrorMsg
   for m in head_messages + main_messages
@@ -64,7 +64,7 @@ endfunction
 
 
 function! fclojure#util#vital() " {{{2
-  return vital#of(fclojure#name())
+  return vital#of(s:PLUGIN_NAME)
 endfunction
 
 
@@ -113,12 +113,15 @@ endfunction
 
 
 
-" Init {{{1
-
-" Vital
-let s:V = fclojure#util#vital()
+" Constants {{{1
 
 call fclojure#util#define_boolean(s:)
+
+let s:PLUGIN_NAME = expand('<sfile>:p:h:t')
+
+" Vital"{{{
+let s:V = fclojure#util#vital()
+"}}}
 
 call fclojure#util#lock_constants(s:)
 

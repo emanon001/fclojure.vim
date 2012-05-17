@@ -33,6 +33,9 @@ command! -nargs=1 -bang FClojureOpenProblem
 command! -nargs=1 FClojureOpenAnswerColumn
       \ call fclojure#open_answer_column(<args>)
 
+command! -nargs=+ FClojureOpenURL
+      \ call fclojure#open_url(<f-args>)
+
 
 
 

@@ -22,14 +22,34 @@ set cpoptions&vim
 
 call fclojure#util#define_boolean(s:)
 
+let s:NONE = {}
+
 " URLs"{{{
 let s:URLS = {
-      \   'root': 'https://www.4clojure.com/',
-      \   'log_in': 'https://www.4clojure.com/login',
-      \   'settings': 'https://www.4clojure.com/settings',
-      \   'problem_list': 'https://www.4clojure.com/problems',
-      \   'problem': 'https://www.4clojure.com/problem',
-      \   'solve': 'https://www.4clojure.com/rest/problem',
+      \   'root': {
+      \     'url': 'https://www.4clojure.com/',
+      \     'is_format_string': s:FALSE,
+      \   },
+      \   'log_in': {
+      \     'url': 'https://www.4clojure.com/login',
+      \     'is_format_string': s:FALSE,
+      \   },
+      \   'settings': {
+      \     'url': 'https://www.4clojure.com/settings',
+      \     'is_format_string': s:FALSE,
+      \   },
+      \   'problem_list': {
+      \     'url': 'https://www.4clojure.com/problems',
+      \     'is_format_string': s:FALSE,
+      \   },
+      \   'problem': {
+      \     'url': 'https://www.4clojure.com/problem/%s',
+      \     'is_format_string': s:TRUE,
+      \   },
+      \   'solve': {
+      \     'url': 'https://www.4clojure.com/rest/problem/%s',
+      \     'is_format_string': s:TRUE,
+      \   },
       \ }
 "}}}
 
@@ -112,7 +132,7 @@ function! fclojure#core#get_problem(problem_no, use_cache) " {{{2
   endif
   "}}}
 
-  let url = s:get_problem_url(a:problem_no)
+  let url = s:get_url('problem', a:problem_no)
   let header = s:get_common_header()
   let response = s:H.get(url, {}, header)
   let problem = fclojure#parser#parse_problem(response)
@@ -127,7 +147,7 @@ function! fclojure#core#solve_problem(problem_no, answer) " {{{2
     call s:log_in()
   endif
   "}}}
-  let url = s:get_solve_url(a:problem_no)
+  let url = s:get_url('solve', a:problem_no)
   " Param "{{{
   let param = {}
   let param.id = a:problem_no
@@ -141,6 +161,11 @@ endfunction
 
 function! fclojure#core#get_file_path(name) " {{{2
   return s:get_file_path(a:name)
+endfunction
+
+
+function! fclojure#core#get_url(name, ...) " {{{2
+  return call('s:get_url', [a:name] + a:000)
 endfunction
 
 
@@ -296,25 +321,14 @@ endfunction
 "}}}
 
 
-function! s:get_url(name) " {{{2
-  let url = get(s:URLS, a:name, '')
-  if url == ''
+function! s:get_url(name, ...) " {{{2
+  let url_info = get(s:URLS, a:name, s:NONE)
+  if url_info is s:NONE
     throw fclojure#util#create_exception('IllegalArgument',
           \ printf('URL of "%s" doesn''t exist.', a:name))
   endif
-  return url
-endfunction
-
-
-function! s:get_problem_url(problem_no) " {{{2
-  let url = get(s:URLS, 'problem')
-  return url . '/' . a:problem_no
-endfunction
-
-
-function! s:get_solve_url(problem_no) " {{{2
-  let url = get(s:URLS, 'solve')
-  return url . '/' . a:problem_no
+  return url_info.is_format_string ? call('printf', [url_info.url] + a:000)
+        \                          : url_info.url
 endfunction
 
 

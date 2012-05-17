@@ -20,9 +20,13 @@ set cpoptions&vim
 
 " Constants {{{1
 
-let s:PLUGIN_NAME = expand('<sfile>:t:r')
+call fclojure#util#define_boolean(s:)
 
-lockvar! s:PLUGIN_NAME
+" Vital"{{{
+let s:V = fclojure#util#vital()
+"}}}
+
+call fclojure#util#lock_constants(s:)
 
 
 
@@ -75,6 +79,17 @@ function! fclojure#solve_problem(problem_no, answer) " {{{2
 endfunction
 
 
+function! fclojure#open_url(name, ...) " {{{2
+  try
+    call s:V.system(printf('%s %s',
+          \           fclojure#option#get('open_url_command'),
+          \           call('fclojure#core#get_url', [a:name] + a:000)))
+  catch /^fclojure:/
+    call fclojure#util#print_error(v:exception)
+  endtry
+endfunction
+
+
 function! fclojure#add_callback(event, callback) " {{{2
   if !has_key(s:callback_table, a:event)
     let s:callback_table[a:event] = []
@@ -88,11 +103,6 @@ function! fclojure#delete_callback(event, callback) " {{{2
     return
   endif
   call filter(s:callback_table[a:event], 'v:val != a:callback')
-endfunction
-
-
-function! fclojure#name() " {{{2
-  return s:PLUGIN_NAME
 endfunction
 
 

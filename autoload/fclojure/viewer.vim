@@ -84,11 +84,17 @@ nnoremap <silent> <Plug>(fclojure-select-problem)
 nnoremap <silent> <Plug>(fclojure-quit-problem-list)
       \ :<C-u>quit<CR>
 
+nnoremap <silent> <Plug>(fclojure-open-problem-list-url)
+      \ :<C-u>call fclojure#open_url('problem_list')<CR>
+
 nnoremap <silent> <Plug>(fclojure-open-answer-column)
       \ :<C-u>call fclojure#open_answer_column(b:fclojure_problem_no)<CR>
 
 nnoremap <silent> <Plug>(fclojure-quit-problem)
       \ :<C-u>quit<CR>
+
+nnoremap <silent> <Plug>(fclojure-open-problem-url)
+      \ :<C-u>call fclojure#open_url('problem', b:fclojure_problem_no)<CR>
 
 nnoremap <silent> <Plug>(fclojure-solve-problem-by-answer-column)
       \ :<C-u>call fclojure#solve_problem(b:fclojure_problem_no, join(getline(1, '$'), "\n"))<CR>
@@ -124,6 +130,7 @@ endfunction
 function! s:problem_list_setter.set_key_mappings()
   nmap <buffer> o <Plug>(fclojure-select-problem)
   nmap <buffer> q <Plug>(fclojure-quit-problem-list)
+  nmap <buffer> u <Plug>(fclojure-open-problem-list-url)
 endfunction
 "}}}
 
@@ -164,6 +171,7 @@ endfunction
 function! s:problem_setter.set_key_mappings()
   nmap <buffer> o <Plug>(fclojure-open-answer-column)
   nmap <buffer> q <Plug>(fclojure-quit-problem)
+  nmap <buffer> u <Plug>(fclojure-open-problem-url)
 endfunction
 "}}}
 
@@ -273,7 +281,7 @@ endfunction
 
 function! s:create_buffer(bufname, setter) " {{{2
   let setter = extend(s:default_setter, a:setter)
-  let open_command = fclojure#option#get('open_command')
+  let open_command = fclojure#option#get('open_buffer_command')
   execute open_command
   edit `=a:bufname`
   call setter.set_options()
@@ -304,17 +312,13 @@ function! s:move_to_buffer(bufnr) " {{{2
   endif
   let winnr = bufwinnr(a:bufnr)
   if winnr == -1
-    let open_command = fclojure#option#get('open_command')
+    let open_command = fclojure#option#get('open_buffer_command')
     execute open_command
     execute a:bufnr . 'buffer'
   else
     execute winnr . 'wincmd w'
   endif
 endfunction
-
-
-
-
 
 
 function! s:callback_of_solve(problem_no, result) " {{{2
@@ -388,8 +392,6 @@ endfunction
 function! s:sid() " {{{2
   return printf('<SNR>%d_', s:snr())
 endfunction
-
-
 
 
 
