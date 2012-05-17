@@ -27,6 +27,7 @@ let s:MAX_LINE_LENGTH = 78
 
 " Vital"{{{
 let s:V = fclojure#util#vital()
+let s:F = s:V.import('System.File')
 "}}}
 
 call fclojure#util#lock_constants(s:)
@@ -77,7 +78,6 @@ endfunction
 
 " Key mappings {{{2
 
-
 nnoremap <silent> <Plug>(fclojure-select-problem)
       \ :<C-u>call fclojure#open_problem(str2nr(matchstr(getline('.'), '^#\zs\d\+')), 1)<CR>
 
@@ -107,22 +107,21 @@ sign define fclojure-failed-test-case text=> linehl=ErrorMsg texthl=ErrorMsg
 " Core {{{1
 
 function! s:create_problem_list_buffer(problem_list) " {{{2
-  let setter = {}
-  let setter.set_options = function('s:set_problem_list_buffer_options')
-  let setter.set_key_mappings = function('s:set_problem_list_buffer_key_mappings')
-  call s:create_buffer('Problem-List', setter)
+  call s:create_buffer('Problem-List', s:problem_list_setter)
   call setline(1, s:problem_list_to_lines(a:problem_list))
   let s:problem_list_bufnr = bufnr('%')
   setlocal nomodifiable readonly
 endfunction
 
-function! s:set_problem_list_buffer_options() dict "{{{
+" Problem list setter"{{{
+let s:problem_list_setter = {}
+
+function! s:problem_list_setter.set_options()
    setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
    setfiletype fclojure-problem-list
 endfunction
-"}}}
 
-function! s:set_problem_list_buffer_key_mappings() dict "{{{
+function! s:problem_list_setter.set_key_mappings()
   nmap <buffer> o <Plug>(fclojure-select-problem)
   nmap <buffer> q <Plug>(fclojure-quit-problem-list)
 endfunction
@@ -145,10 +144,7 @@ endfunction
 
 
 function! s:create_problem_buffer(problem) " {{{2
-  let setter = {}
-  let setter.set_options = function('s:set_problem_buffer_options')
-  let setter.set_key_mappings = function('s:set_problem_buffer_key_mappings')
-  call s:create_buffer(printf('Problem #%s', a:problem.no), setter)
+  call s:create_buffer(printf('Problem #%s', a:problem.no), s:problem_setter)
   let info = s:problem_to_lines_info(a:problem)
   call setline(1, info.lines)
   let info.bufnr = bufnr('%')
@@ -157,13 +153,15 @@ function! s:create_problem_buffer(problem) " {{{2
   setlocal nomodifiable readonly
 endfunction
 
-function! s:set_problem_buffer_options() dict "{{{
+" Problem setter"{{{
+let s:problem_setter = {}
+
+function! s:problem_setter.set_options()
   setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
   setfiletype fclojure-problem
 endfunction
-"}}}
 
-function! s:set_problem_buffer_key_mappings() dict "{{{
+function! s:problem_setter.set_key_mappings()
   nmap <buffer> o <Plug>(fclojure-open-answer-column)
   nmap <buffer> q <Plug>(fclojure-quit-problem)
 endfunction
@@ -221,36 +219,82 @@ endfunction
 
 
 function! s:create_answer_buffer(problem_no) " {{{2
-  let setter = {}
-  let setter.set_options = function('s:set_answer_buffer_options')
-  let setter.set_key_mappings = function('s:set_answer_buffer_key_mappings')
-  call s:create_buffer(printf('Answer-Column #%s', a:problem_no), setter)
+  call s:create_buffer(printf('Answer-Column #%s', a:problem_no), s:answer_setter)
   let s:answer_column_view_table[a:problem_no] = {'bufnr': bufnr('%')}
   let b:fclojure_problem_no = a:problem_no
+  if filereadable(s:get_answer_file_path(a:problem_no))
+    call setline(1, s:read_answer(a:problem_no))
+    setlocal nomodified
+  endif
 endfunction
 
-function! s:set_answer_buffer_options() dict "{{{
-  setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
+" Answer setter"{{{
+let s:answer_setter = {}
+
+function! s:answer_setter.set_options()
+  setlocal bufhidden=hide nobuflisted
   setfiletype clojure
+endfunction
+
+function! s:answer_setter.set_key_mappings()
+  nmap <buffer> <LocalLeader>s <Plug>(fclojure-solve-problem-by-answer-column)
+  nmap <buffer> q <Plug>(fclojure-quit-answer-column)
+endfunction
+
+function! s:answer_setter.set_auto_commands()
+  augroup fclojure-answer-column-buffer
+    autocmd! * <buffer>
+    autocmd BufWriteCmd <buffer>
+          \ call s:write_answer(b:fclojure_problem_no, getline(1, '$')) |
+          \ setlocal nomodified
+  augroup END
 endfunction
 "}}}
 
-function! s:set_answer_buffer_key_mappings() dict "{{{
-  nmap <buffer> <LocalLeader>s <Plug>(fclojure-solve-problem-by-answer-column)
-  nmap <buffer> q <Plug>(fclojure-quit-answer-column)
+function! s:read_answer(problem_no)"{{{
+  return readfile(s:get_answer_file_path(a:problem_no))
+endfunction
+"}}}
+
+function! s:write_answer(problem_no, lines)"{{{
+  let answer_dir = fclojure#core#get_file_path('answer_dir')
+  if !isdirectory(answer_dir)
+    call s:F.mkdir_nothrow(answer_dir, 'p')
+  endif
+  call writefile(a:lines, s:get_answer_file_path(a:problem_no))
+endfunction
+"}}}
+
+function! s:get_answer_file_path(problem_no)"{{{
+  return printf("%s/%d.clj", fclojure#core#get_file_path('answer_dir'), a:problem_no)
 endfunction
 "}}}
 
 
 function! s:create_buffer(bufname, setter) " {{{2
+  let setter = extend(s:default_setter, a:setter)
   let open_command = fclojure#option#get('open_command')
   execute open_command
   edit `=a:bufname`
-  call a:setter.set_options()
+  call setter.set_options()
+  call setter.set_auto_commands()
   if s:use_default_key_mappings_p()
-    call a:setter.set_key_mappings()
+    call setter.set_key_mappings()
   endif
 endfunction
+
+" Default setter."{{{
+let s:default_setter = {}
+
+function! s:default_setter.set_options()
+endfunction
+
+function! s:default_setter.set_key_mappings()
+endfunction
+
+function! s:default_setter.set_auto_commands()
+endfunction
+"}}}
 
 
 function! s:move_to_buffer(bufnr) " {{{2

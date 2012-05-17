@@ -45,6 +45,9 @@ let s:PATHS = {
       \   'cache_dir': {
       \     'name': 'caches',
       \   },
+      \   'answer_dir': {
+      \     'name': 'answers',
+      \   },
       \ }
 "}}}
 
@@ -135,6 +138,11 @@ function! fclojure#core#solve_problem(problem_no, answer) " {{{2
   let header = s:get_common_header()
   let response = s:H.post(url, param, header)
   return fclojure#parser#parse_result_of_solve(response)
+endfunction
+
+
+function! fclojure#core#get_file_path(name) " {{{2
+  return s:get_file_path(a:name)
 endfunction
 
 
@@ -290,10 +298,6 @@ endfunction
 "}}}
 
 
-
-
-" Misc {{{1
-
 function! s:get_url(name) " {{{2
   let url = get(s:URLS, a:name, '')
   if url == ''
@@ -301,6 +305,18 @@ function! s:get_url(name) " {{{2
           \ printf('URL of "%s" doesn''t exist.', a:name))
   endif
   return url
+endfunction
+
+
+function! s:get_problem_url(problem_no) " {{{2
+  let url = get(s:URLS, 'problem')
+  return url . '/' . a:problem_no
+endfunction
+
+
+function! s:get_solve_url(problem_no) " {{{2
+  let url = get(s:URLS, 'solve')
+  return url . '/' . a:problem_no
 endfunction
 
 
@@ -318,17 +334,9 @@ function! s:get_file_path(name) " {{{2
 endfunction
 
 
-function! s:get_problem_url(problem_no) " {{{2
-  let url = get(s:URLS, 'problem')
-  return url . '/' . a:problem_no
-endfunction
 
 
-function! s:get_solve_url(problem_no) " {{{2
-  let url = get(s:URLS, 'solve')
-  return url . '/' . a:problem_no
-endfunction
-
+" Misc {{{1
 
 function! s:snr() " {{{2
   return str2nr(matchstr(expand('<sfile>'), '<SNR>\zs\d\+\ze_snr$'))
