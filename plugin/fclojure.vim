@@ -30,6 +30,9 @@ command! -nargs=0 -bang FClojureOpenProblemList
 command! -nargs=1 -bang FClojureOpenProblem
       \ call fclojure#open_problem(<args>, '<bang>' == '')
 
+command! -nargs=1 FClojureOpenAnswerColumn
+      \ call fclojure#open_answer_column(<args>)
+
 
 
 

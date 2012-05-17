@@ -66,8 +66,6 @@ call fclojure#util#lock_constants(s:)
 
 " Variables {{{1
 
-call fclojure#option#init()
-
 let s:is_logged_in = s:FALSE
 let s:problem_list = []
 let s:problem_detail_table = {}

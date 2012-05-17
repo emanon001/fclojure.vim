@@ -58,6 +58,15 @@ function! fclojure#open_problem(problem_no, use_cache) " {{{2
 endfunction
 
 
+function! fclojure#open_answer_column(problem_no) " {{{2
+  try
+    call fclojure#viewer#open_answer_column(a:problem_no)
+  catch /^fclojure:/
+    call fclojure#util#print_error(v:exception)
+  endtry
+endfunction
+
+
 function! fclojure#solve_problem(problem_no, answer) " {{{2
   let result = fclojure#core#solve_problem(a:problem_no, a:answer)
   call s:notify_callbacks('solve-problem', a:problem_no, result)

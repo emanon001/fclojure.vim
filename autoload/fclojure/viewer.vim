@@ -319,19 +319,24 @@ endfunction
 
 function! s:callback_of_solve(problem_no, result) " {{{2
   let bufnr = get(get(s:problem_view_table, a:problem_no, {}), 'bufnr', -1)
-  if !bufexists(bufnr)
-    throw fclojure#util#create_exception('IllegalState',
-          \ printf('Problem No.%s hasn''t been opened.', a:problem_no)
+  if !bufexists(bufnr) || bufwinnr(bufnr) == -1
+    echohl WarningMsg | echo s:get_result_message(a:result) | echohl None
+    return
   endif
   call s:set_result_message_in_problem_buffer(a:problem_no, a:result)
   call s:sign_place_in_problem_buffer(a:problem_no, a:result)
 endfunction
 
+function! s:get_result_message(result)"{{{
+  return strchars(a:result.message) > 0 ? a:result.message
+        \                               : a:result.error
+endfunction
+"}}}
+
 function! s:set_result_message_in_problem_buffer(problem_no, result)"{{{
   let info = s:problem_view_table[a:problem_no]
   let signs = info.signs
-  let message = strchars(a:result.message) > 0 ? a:result.message
-        \                                      : a:result.error
+  let message = s:get_result_message(a:result)
   call s:move_to_buffer(info.bufnr)
   let lines = getline(1, signs.result_message - 1)
   let lines += ['']

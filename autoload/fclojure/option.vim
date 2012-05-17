@@ -41,13 +41,17 @@ function! fclojure#option#get(name) " {{{2
   let option = get(s:option_table, a:name, not_exist)
   if option is not_exist
     throw fclojure#util#create_exception('IllegalArgument',
-          \ printf('Option "%s" doesn''t exsist.', a:name))
+          \ printf('Option "%s" doesn''t exist.', a:name))
   endif
   return option
 endfunction
 
 
-function! fclojure#option#init() " {{{2
+
+
+" Init {{{1
+
+function! s:init_options() " {{{2
   let user_option_table = get(g:, 'fclojure', {})
   call s:set_option('curl_command',
         \ get(user_option_table, 'curl_command', 'curl'))
@@ -59,14 +63,11 @@ function! fclojure#option#init() " {{{2
         \ get(user_option_table, 'no_default_key_mappings', s:FALSE))
 endfunction
 
-
-
-
-" Core {{{1
-
 function! s:set_option(var, val) " {{{2
   let s:option_table[a:var] = a:val
 endfunction
+
+call s:init_options()
 
 
 
