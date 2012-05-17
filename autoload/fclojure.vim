@@ -39,22 +39,20 @@ let s:callback_table = {}
 function! fclojure#open_problem_list(use_cache) " {{{2
   try
     let problem_list = fclojure#core#get_problem_list(a:use_cache)
+    call fclojure#viewer#open_problem_list(problem_list)
   catch /^fclojure:/
     call fclojure#util#print_error(v:exception)
-    return
   endtry
-  call fclojure#viewer#open_problem_list(problem_list)
 endfunction
 
 
 function! fclojure#open_problem(problem_no, use_cache) " {{{2
   try
     let problem = fclojure#core#get_problem(a:problem_no, a:use_cache)
+    call fclojure#viewer#open_problem(problem)
   catch /^fclojure:/
     call fclojure#util#print_error(v:exception)
-    return
   endtry
-  call fclojure#viewer#open_problem(problem)
 endfunction
 
 
@@ -68,8 +66,12 @@ endfunction
 
 
 function! fclojure#solve_problem(problem_no, answer) " {{{2
-  let result = fclojure#core#solve_problem(a:problem_no, a:answer)
-  call s:notify_callbacks('solve-problem', a:problem_no, result)
+  try
+    let result = fclojure#core#solve_problem(a:problem_no, a:answer)
+    call s:notify_callbacks('solve-problem', a:problem_no, result)
+  catch /^fclojure:/
+    call fclojure#util#print_error(v:exception)
+  endtry
 endfunction
 
 
