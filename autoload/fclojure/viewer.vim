@@ -20,7 +20,7 @@ set cpoptions&vim
 
 " Constants {{{1
 
-call fclojure#util#provide_boolean(s:)
+call fclojure#util#define_boolean(s:)
 
 " TODO: Set optional max line length.
 let s:MAX_LINE_LENGTH = 78

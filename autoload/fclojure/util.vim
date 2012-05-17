@@ -68,7 +68,7 @@ function! fclojure#util#vital() " {{{2
 endfunction
 
 
-function! fclojure#util#provide_boolean(scope) " {{{2
+function! fclojure#util#define_boolean(scope) " {{{2
   let a:scope.FALSE = 0
   let a:scope.TRUE = !a:scope.FALSE
 endfunction
@@ -118,7 +118,7 @@ endfunction
 " Vital
 let s:V = fclojure#util#vital()
 
-call fclojure#util#provide_boolean(s:)
+call fclojure#util#define_boolean(s:)
 
 call fclojure#util#lock_constants(s:)
 
