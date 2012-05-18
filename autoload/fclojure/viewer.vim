@@ -85,7 +85,7 @@ nnoremap <silent> <Plug>(fclojure-quit-problem-list)
       \ :<C-u>quit<CR>
 
 nnoremap <silent> <Plug>(fclojure-open-problem-list-url)
-      \ :<C-u>call fclojure#open_url('problem_list')<CR>
+      \ :<C-u>call fclojure#open_problem_list_url()<CR>
 
 nnoremap <silent> <Plug>(fclojure-open-answer-column)
       \ :<C-u>call fclojure#open_answer_column(b:fclojure_problem_no)<CR>
@@ -94,7 +94,7 @@ nnoremap <silent> <Plug>(fclojure-quit-problem)
       \ :<C-u>quit<CR>
 
 nnoremap <silent> <Plug>(fclojure-open-problem-url)
-      \ :<C-u>call fclojure#open_url('problem', b:fclojure_problem_no)<CR>
+      \ :<C-u>call fclojure#open_problem_url(b:fclojure_problem_no)<CR>
 
 nnoremap <silent> <Plug>(fclojure-solve-problem-by-answer-column)
       \ :<C-u>call fclojure#solve_problem(b:fclojure_problem_no, join(getline(1, '$'), "\n"))<CR>
@@ -265,7 +265,7 @@ endfunction
 "}}}
 
 function! s:write_answer(problem_no, lines)"{{{
-  let answer_dir = fclojure#core#get_file_path('answer_dir')
+  let answer_dir = fclojure#core#get_answer_dir_path()
   if !isdirectory(answer_dir)
     call s:F.mkdir_nothrow(answer_dir, 'p')
   endif
@@ -274,7 +274,7 @@ endfunction
 "}}}
 
 function! s:get_answer_file_path(problem_no)"{{{
-  return printf("%s/%03d.clj", fclojure#core#get_file_path('answer_dir'), a:problem_no)
+  return printf("%s/%03d.clj", fclojure#core#get_answer_dir_path(), a:problem_no)
 endfunction
 "}}}
 

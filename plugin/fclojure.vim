@@ -33,8 +33,20 @@ command! -nargs=1 -bang FClojureOpenProblem
 command! -nargs=1 FClojureOpenAnswerColumn
       \ call fclojure#open_answer_column(<args>)
 
-command! -nargs=+ FClojureOpenURL
-      \ call fclojure#open_url(<f-args>)
+command! -nargs=0 FClojureOpenTopURL
+      \ call fclojure#open_top_url()
+
+command! -nargs=0 FClojureOpenLogInURL
+      \ call fclojure#open_log_in_url()
+
+command! -nargs=0 FClojureOpenSettingsURL
+      \ call fclojure#open_settings_url()
+
+command! -nargs=0 FClojureOpenProblemListURL
+      \ call fclojure#open_problem_list_url()
+
+command! -nargs=1 FClojureOpenProblemURL
+      \ call fclojure#open_problem_url(<args>)
 
 
 

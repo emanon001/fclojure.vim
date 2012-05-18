@@ -26,30 +26,12 @@ let s:NONE = {}
 
 " URLs"{{{
 let s:URLS = {
-      \   'root': {
-      \     'url': 'https://www.4clojure.com/',
-      \     'is_format_string': s:FALSE,
-      \   },
-      \   'log_in': {
-      \     'url': 'https://www.4clojure.com/login',
-      \     'is_format_string': s:FALSE,
-      \   },
-      \   'settings': {
-      \     'url': 'https://www.4clojure.com/settings',
-      \     'is_format_string': s:FALSE,
-      \   },
-      \   'problem_list': {
-      \     'url': 'https://www.4clojure.com/problems',
-      \     'is_format_string': s:FALSE,
-      \   },
-      \   'problem': {
-      \     'url': 'https://www.4clojure.com/problem/%s',
-      \     'is_format_string': s:TRUE,
-      \   },
-      \   'solve': {
-      \     'url': 'https://www.4clojure.com/rest/problem/%s',
-      \     'is_format_string': s:TRUE,
-      \   },
+      \   'top': 'https://www.4clojure.com/',
+      \   'log_in': 'https://www.4clojure.com/login',
+      \   'settings': 'https://www.4clojure.com/settings',
+      \   'problem_list': 'https://www.4clojure.com/problems',
+      \   'problem': 'https://www.4clojure.com/problem',
+      \   'solve': 'https://www.4clojure.com/rest/problem',
       \ }
 "}}}
 
@@ -111,7 +93,7 @@ function! fclojure#core#get_problem_list(use_cache) " {{{2
   endif
   "}}}
 
-  let url = s:get_url('problem_list')
+  let url = fclojure#core#get_problem_list_url()
   let header = s:get_common_header()
   let response = s:H.get(url, {}, header)
   let problem_list = fclojure#parser#parse_problem_list(response)
@@ -132,7 +114,7 @@ function! fclojure#core#get_problem(problem_no, use_cache) " {{{2
   endif
   "}}}
 
-  let url = s:get_url('problem', a:problem_no)
+  let url = fclojure#core#get_problem_url(a:problem_no)
   let header = s:get_common_header()
   let response = s:H.get(url, {}, header)
   let problem = fclojure#parser#parse_problem(response)
@@ -147,7 +129,7 @@ function! fclojure#core#solve_problem(problem_no, answer) " {{{2
     call s:log_in()
   endif
   "}}}
-  let url = s:get_url('solve', a:problem_no)
+  let url = fclojure#core#get_solve_url(a:problem_no)
   " Param "{{{
   let param = {}
   let param.id = a:problem_no
@@ -159,13 +141,53 @@ function! fclojure#core#solve_problem(problem_no, answer) " {{{2
 endfunction
 
 
-function! fclojure#core#get_file_path(name) " {{{2
-  return s:get_file_path(a:name)
+function! fclojure#core#get_cookie_dir_path() " {{{2
+  return s:get_file_path('cookie_dir')
 endfunction
 
 
-function! fclojure#core#get_url(name, ...) " {{{2
-  return call('s:get_url', [a:name] + a:000)
+function! fclojure#core#get_cookie_file_path() " {{{2
+  return s:get_file_path('cookie')
+endfunction
+
+
+function! fclojure#core#get_cache_dir_path() " {{{2
+  return s:get_file_path('cache_dir')
+endfunction
+
+
+function! fclojure#core#get_answer_dir_path() " {{{2
+  return s:get_file_path('answer_dir')
+endfunction
+
+
+function! fclojure#core#get_top_url() " {{{2
+  return s:get_url('top')
+endfunction
+
+
+function! fclojure#core#get_log_in_url() " {{{2
+  return s:get_url('log_in')
+endfunction
+
+
+function! fclojure#core#get_settings_url() " {{{2
+  return s:get_url('settings')
+endfunction
+
+
+function! fclojure#core#get_problem_list_url() " {{{2
+  return s:get_url('problem_list')
+endfunction
+
+
+function! fclojure#core#get_problem_url(problem_no) " {{{2
+  return printf('%s/%s', s:get_url('problem'), a:problem_no)
+endfunction
+
+
+function! fclojure#core#get_solve_url(problem_no) " {{{2
+  return printf('%s/%s', s:get_url('solve'), a:problem_no)
 endfunction
 
 
@@ -195,9 +217,9 @@ endfunction
 
 
 function! s:enabled_cookie_p() " {{{2
-  let cookie_file = s:get_file_path('cookie')
+  let cookie_file = fclojure#core#get_cookie_file_path()
   if filereadable(cookie_file)
-    let url = s:get_url('settings')
+    let url = fclojure#core#get_top_url()
     let cookie = s:get_cookie()
     let header = {'Cookie': cookie}
     let res = s:H.get(url, {}, header)
@@ -229,16 +251,16 @@ function! s:log_in_by_user_input() " {{{2
   "       *log-in url* -> [problem-list url] or [log-in url]
   "       *log-in url* response is required.
   let command = printf('%s %s -s -k -i -d user=%s -d pwd=%s -c "%s"',
-        \              s:curl_command, s:get_url('log_in'),
+        \              s:curl_command, fclojure#core#get_log_in_url(),
         \              user_name, password,
-        \              escape(s:get_file_path('cookie'), '"'))
+        \              escape(fclojure#core#get_cookie_file_path(), '"'))
   " Response is only a header.
   let header = s:V.system(command)
   if header =~# 'Location: /problems'
     return s:TRUE
   endif
 
-  call delete(s:get_file_path('cookie'))
+  call delete(fclojure#core#get_cookie_file_path())
   return s:FALSE
 endfunction
 
@@ -250,14 +272,15 @@ endfunction
 
 function! s:get_cookie() " {{{2
   " XXX
-  let [name, value] = matchlist(join(readfile(s:get_file_path('cookie'))),
+  let [name, value] = matchlist(join(
+        \                         readfile(fclojure#core#get_cookie_file_path())),
         \                       '.*\(ring-session\)\s*\(\S*\)')[1:2]
   return printf('%s=%s', name, value)
 endfunction
 
 
 function! s:create_cookie_dir() " {{{2
-  let cookie_dir = s:get_file_path('cookie_dir')
+  let cookie_dir = fclojure#core#get_cookie_dir_path()
   if !isdirectory(cookie_dir)
     call s:F.mkdir_nothrow(cookie_dir, 'p')
   endif
@@ -271,21 +294,20 @@ function! s:get_common_header() " {{{2
 endfunction
 
 
-
-
 function! s:read_problem_list_cache() " {{{2
-  return map(s:C.readfile(s:get_file_path('cache_dir'), 'problem_list'), 'eval(v:val)')
+  return map(s:C.readfile(fclojure#core#get_cache_dir_path(), 'problem_list'),
+        \    'eval(v:val)')
 endfunction
 
 
 function! s:write_problem_list_cache(problem_list) " {{{2
-  call s:C.writefile(s:get_file_path('cache_dir'), 'problem_list',
+  call s:C.writefile(fclojure#core#get_cache_dir_path(), 'problem_list',
         \            map(copy(a:problem_list), 'string(v:val)'))
 endfunction
 
 
 function! s:read_problem_details_cache() " {{{2
-  let cache = s:C.readfile(s:get_file_path('cache_dir'), 'problem_details')
+  let cache = s:C.readfile(fclojure#core#get_cache_dir_path(), 'problem_details')
   let problems = {}
   for _ in cache
     let problem = eval(_)
@@ -297,7 +319,7 @@ endfunction
 
 function! s:write_problem_details_cache(problem_details) " {{{2
   let cache = map(values(a:problem_details), 'string(v:val)')
-  call s:C.writefile(s:get_file_path('cache_dir'), 'problem_details', cache)
+  call s:C.writefile(fclojure#core#get_cache_dir_path(), 'problem_details', cache)
 endfunction
 
 
@@ -321,14 +343,13 @@ endfunction
 "}}}
 
 
-function! s:get_url(name, ...) " {{{2
-  let url_info = get(s:URLS, a:name, s:NONE)
-  if url_info is s:NONE
+function! s:get_url(name) " {{{2
+  let url = get(s:URLS, a:name, s:NONE)
+  if url is s:NONE
     throw fclojure#util#create_exception('IllegalArgument',
           \ printf('URL of "%s" doesn''t exist.', a:name))
   endif
-  return url_info.is_format_string ? call('printf', [url_info.url] + a:000)
-        \                          : url_info.url
+  return url
 endfunction
 
 
