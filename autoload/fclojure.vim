@@ -44,8 +44,8 @@ function! fclojure#open_problem_list(use_cache) " {{{2
   try
     let problem_list = fclojure#core#get_problem_list(a:use_cache)
     call fclojure#viewer#open_problem_list(problem_list)
-  catch /^fclojure:/
-    call fclojure#util#print_error(v:exception)
+  catch /.*/
+    call fclojure#util#print_error([v:exception] + [v:throwpoint])
   endtry
 endfunction
 
@@ -54,8 +54,8 @@ function! fclojure#open_problem(problem_no, use_cache) " {{{2
   try
     let problem = fclojure#core#get_problem(a:problem_no, a:use_cache)
     call fclojure#viewer#open_problem(problem)
-  catch /^fclojure:/
-    call fclojure#util#print_error(v:exception)
+  catch /.*/
+    call fclojure#util#print_error([v:exception] + [v:throwpoint])
   endtry
 endfunction
 
@@ -63,8 +63,8 @@ endfunction
 function! fclojure#open_answer_column(problem_no) " {{{2
   try
     call fclojure#viewer#open_answer_column(a:problem_no)
-  catch /^fclojure:/
-    call fclojure#util#print_error(v:exception)
+  catch /.*/
+    call fclojure#util#print_error([v:exception] + [v:throwpoint])
   endtry
 endfunction
 
@@ -73,8 +73,8 @@ function! fclojure#solve_problem(problem_no, answer) " {{{2
   try
     let result = fclojure#core#solve_problem(a:problem_no, a:answer)
     call s:notify_callbacks('solve-problem', a:problem_no, result)
-  catch /^fclojure:/
-    call fclojure#util#print_error(v:exception)
+  catch /.*/
+    call fclojure#util#print_error([v:exception] + [v:throwpoint])
   endtry
 endfunction
 
@@ -84,8 +84,8 @@ function! fclojure#open_url(name, ...) " {{{2
     call s:V.system(printf('%s %s',
           \           fclojure#option#get('open_url_command'),
           \           call('fclojure#core#get_url', [a:name] + a:000)))
-  catch /^fclojure:/
-    call fclojure#util#print_error(v:exception)
+  catch /.*/
+    call fclojure#util#print_error([v:exception] + [v:throwpoint])
   endtry
 endfunction
 
