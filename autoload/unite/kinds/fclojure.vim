@@ -68,6 +68,19 @@ endfunction
 "}}}
 
 
+let s:kind.action_table.open_url = {
+      \   'is_selectable': s:TRUE,
+      \   'description': 'open problem URLs',
+      \ }
+
+function! s:kind.action_table.open_url.func(candidates) "{{{
+  for c in a:candidates
+    call fclojure#open_problem_url(c.action__problem_no)
+  endfor
+endfunction
+"}}}
+
+
 
 
 " Epilogue {{{1
