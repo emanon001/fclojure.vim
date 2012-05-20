@@ -111,6 +111,11 @@ function! fclojure#util#string_value_of_problem_item(val) " {{{2
 endfunction
 
 
+function! fclojure#util#list(...) " {{{2
+  return copy(a:000)
+endfunction
+
+
 
 
 " Constants {{{1

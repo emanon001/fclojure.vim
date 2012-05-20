@@ -45,7 +45,7 @@ function! fclojure#open_problem_list(use_cache) " {{{2
     let problem_list = fclojure#core#get_problem_list(a:use_cache)
     call fclojure#viewer#open_problem_list(problem_list)
   catch /.*/
-    call fclojure#util#print_error([v:exception] + [v:throwpoint])
+    call fclojure#util#print_error(fclojure#util#list(v:exception, v:throwpoint))
   endtry
 endfunction
 
@@ -55,7 +55,7 @@ function! fclojure#open_problem(problem_no, use_cache) " {{{2
     let problem = fclojure#core#get_problem(a:problem_no, a:use_cache)
     call fclojure#viewer#open_problem(problem)
   catch /.*/
-    call fclojure#util#print_error([v:exception] + [v:throwpoint])
+    call fclojure#util#print_error(fclojure#util#list(v:exception, v:throwpoint))
   endtry
 endfunction
 
@@ -64,7 +64,7 @@ function! fclojure#open_answer_column(problem_no) " {{{2
   try
     call fclojure#viewer#open_answer_column(a:problem_no)
   catch /.*/
-    call fclojure#util#print_error([v:exception] + [v:throwpoint])
+    call fclojure#util#print_error(fclojure#util#list(v:exception, v:throwpoint))
   endtry
 endfunction
 
@@ -74,7 +74,7 @@ function! fclojure#solve_problem(problem_no, answer) " {{{2
     let result = fclojure#core#solve_problem(a:problem_no, a:answer)
     call s:notify_callbacks('solve-problem', a:problem_no, result)
   catch /.*/
-    call fclojure#util#print_error([v:exception] + [v:throwpoint])
+    call fclojure#util#print_error(fclojure#util#list(v:exception, v:throwpoint))
   endtry
 endfunction
 
@@ -83,7 +83,7 @@ function! fclojure#open_top_url() " {{{2
   try
     call s:open_url(fclojure#core#get_top_url())
   catch /.*/
-    call fclojure#util#print_error([v:exception] + [v:throwpoint])
+    call fclojure#util#print_error(fclojure#util#list(v:exception, v:throwpoint))
   endtry
 endfunction
 
@@ -92,7 +92,7 @@ function! fclojure#open_log_in_url() " {{{2
   try
     call s:open_url(fclojure#core#get_log_in_url())
   catch /.*/
-    call fclojure#util#print_error([v:exception] + [v:throwpoint])
+    call fclojure#util#print_error(fclojure#util#list(v:exception, v:throwpoint))
   endtry
 endfunction
 
@@ -101,7 +101,7 @@ function! fclojure#open_settings_url() " {{{2
   try
     call s:open_url(fclojure#core#get_settings_url())
   catch /.*/
-    call fclojure#util#print_error([v:exception] + [v:throwpoint])
+    call fclojure#util#print_error(fclojure#util#list(v:exception, v:throwpoint))
   endtry
 endfunction
 
@@ -110,7 +110,7 @@ function! fclojure#open_problem_list_url() " {{{2
   try
     call s:open_url(fclojure#core#get_problem_list_url())
   catch /.*/
-    call fclojure#util#print_error([v:exception] + [v:throwpoint])
+    call fclojure#util#print_error(fclojure#util#list(v:exception, v:throwpoint))
   endtry
 endfunction
 
@@ -119,7 +119,7 @@ function! fclojure#open_problem_url(problem_no) " {{{2
   try
     call s:open_url(fclojure#core#get_problem_url(a:problem_no))
   catch /.*/
-    call fclojure#util#print_error([v:exception] + [v:throwpoint])
+    call fclojure#util#print_error(fclojure#util#list(v:exception, v:throwpoint))
   endtry
 endfunction
 
@@ -128,7 +128,7 @@ function! fclojure#open_solve_url(problem_no) " {{{2
   try
     call s:open_url(fclojure#core#get_solve_url(a:problem_no))
   catch /.*/
-    call fclojure#util#print_error([v:exception] + [v:throwpoint])
+    call fclojure#util#print_error(fclojure#util#list(v:exception, v:throwpoint))
   endtry
 endfunction
 
