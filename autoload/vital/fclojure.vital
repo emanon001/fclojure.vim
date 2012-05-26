@@ -3,7 +3,6 @@
 Web.Http
 Web.Html
 Web.Json
-System.File
 System.Filepath
 System.Cache
 Prelude

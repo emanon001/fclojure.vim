@@ -56,8 +56,7 @@ let s:PATHS = {
 " Vital"{{{
 let s:V = fclojure#util#vital()
 let s:H = s:V.import('Web.Http')
-let s:F = s:V.import('System.File')
-call s:V.import('System.Filepath', s:F)
+let s:F = s:V.import('System.Filepath')
 let s:C = s:V.import('System.Cache')
 "}}}
 
@@ -282,7 +281,7 @@ endfunction
 function! s:create_cookie_dir() " {{{2
   let cookie_dir = fclojure#core#get_cookie_dir_path()
   if !isdirectory(cookie_dir)
-    call s:F.mkdir_nothrow(cookie_dir, 'p')
+    call mkdir(cookie_dir, 'p')
   endif
 endfunction
 

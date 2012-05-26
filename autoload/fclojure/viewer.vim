@@ -27,7 +27,6 @@ let s:MAX_LINE_LENGTH = 78
 
 " Vital"{{{
 let s:V = fclojure#util#vital()
-let s:F = s:V.import('System.File')
 "}}}
 
 call fclojure#util#lock_constants(s:)
@@ -267,7 +266,7 @@ endfunction
 function! s:write_answer(problem_no, lines)"{{{
   let answer_dir = fclojure#core#get_answer_dir_path()
   if !isdirectory(answer_dir)
-    call s:F.mkdir_nothrow(answer_dir, 'p')
+    call mkdir(answer_dir, 'p')
   endif
   call writefile(a:lines, s:get_answer_file_path(a:problem_no))
 endfunction
