@@ -26,6 +26,7 @@ let s:NONE = {}
 
 " Vital"{{{
 let s:V = fclojure#util#vital()
+let s:F = s:V.import('System.Filepath')
 "}}}
 
 call fclojure#util#lock_constants(s:)
@@ -70,6 +71,11 @@ function! s:get_open_url_command() " {{{2
 endfunction
 
 
+function! s:get_full_path(path) " {{{2
+  return fnamemodify(expand(a:path), ':p')
+endfunction
+
+
 
 
 " Init {{{1
@@ -79,7 +85,10 @@ function! s:init_options() " {{{2
   call s:set_option('curl_command',
         \ get(user_option_table, 'curl_command', 'curl'))
   call s:set_option('data_dir',
-        \ get(user_option_table, 'data_dir', '~/.fclojure'))
+        \ s:get_full_path(get(user_option_table, 'data_dir', '~/.fclojure')))
+  call s:set_option('answer_dir',
+        \ s:get_full_path(get(user_option_table, 'answer_dir',
+        \                     s:F.join(fclojure#option#get('data_dir'), 'answers'))))
   call s:set_option('open_buffer_command',
         \ get(user_option_table, 'open_buffer_command', 'split'))
   call s:set_option('no_default_key_mappings',

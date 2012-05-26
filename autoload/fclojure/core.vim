@@ -47,9 +47,6 @@ let s:PATHS = {
       \   'cache_dir': {
       \     'name': 'caches',
       \   },
-      \   'answer_dir': {
-      \     'name': 'answers',
-      \   },
       \ }
 "}}}
 
@@ -72,8 +69,6 @@ let s:problem_list = []
 let s:problem_detail_table = {}
 let s:problem_list_bufnr = -1
 let s:curl_command = fclojure#option#get('curl_command')
-let s:data_dir = s:F.remove_last_separator(
-      \ fnamemodify(expand(fclojure#option#get('data_dir')), ':p'))
 
 
 
@@ -155,9 +150,6 @@ function! fclojure#core#get_cache_dir_path() " {{{2
 endfunction
 
 
-function! fclojure#core#get_answer_dir_path() " {{{2
-  return s:get_file_path('answer_dir')
-endfunction
 
 
 function! fclojure#core#get_top_url() " {{{2
@@ -361,7 +353,7 @@ function! s:get_file_path(name) " {{{2
   if has_key(file_info, 'parent')
     return s:F.join(s:get_file_path(file_info.parent), file_info.name)
   else
-    return s:F.join(s:data_dir, file_info.name)
+    return s:F.join(fclojure#option#get('data_dir'), file_info.name)
   endif
 endfunction
 

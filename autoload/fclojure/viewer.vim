@@ -27,6 +27,7 @@ let s:MAX_LINE_LENGTH = 78
 
 " Vital"{{{
 let s:V = fclojure#util#vital()
+let s:F = s:V.import('System.Filepath')
 "}}}
 
 call fclojure#util#lock_constants(s:)
@@ -49,9 +50,9 @@ function! fclojure#viewer#open_problem_list(problem_list) " {{{2
   let bufnr = s:problem_list_bufnr
   if bufexists(bufnr)
     call s:move_to_buffer(bufnr)
-    return
+  else
+    call s:create_problem_list_buffer(a:problem_list)
   endif
-  call s:create_problem_list_buffer(a:problem_list)
 endfunction
 
 
@@ -59,9 +60,9 @@ function! fclojure#viewer#open_problem(problem) " {{{2
   let bufnr = get(get(s:problem_view_table, a:problem.no, {}), 'bufnr', -1)
   if bufexists(bufnr)
     call s:move_to_buffer(bufnr)
-    return
+  else
+    call s:create_problem_buffer(a:problem)
   endif
-  call s:create_problem_buffer(a:problem)
 endfunction
 
 
@@ -69,9 +70,10 @@ function! fclojure#viewer#open_answer_column(problem_no) " {{{2
   let bufnr = get(get(s:answer_column_view_table, a:problem_no, {}), 'bufnr', -1)
   if bufexists(bufnr)
     call s:move_to_buffer(bufnr)
-    return
+  else
+    call s:create_answer_dir()
+    call s:create_answer_buffer(a:problem_no)
   endif
-  call s:create_answer_buffer(a:problem_no)
 endfunction
 
 
@@ -226,13 +228,9 @@ endfunction
 
 
 function! s:create_answer_buffer(problem_no) " {{{2
-  call s:create_buffer(printf('Answer-Column #%s', a:problem_no), s:answer_setter)
+  call s:create_buffer(s:get_answer_file_path(a:problem_no), s:answer_setter)
   let s:answer_column_view_table[a:problem_no] = {'bufnr': bufnr('%')}
   let b:fclojure_problem_no = a:problem_no
-  if filereadable(s:get_answer_file_path(a:problem_no))
-    call setline(1, s:read_answer(a:problem_no))
-    setlocal nomodified
-  endif
 endfunction
 
 " Answer setter"{{{
@@ -248,32 +246,19 @@ function! s:answer_setter.set_key_mappings()
   nmap <buffer> q <Plug>(fclojure-quit-answer-column)
 endfunction
 
-function! s:answer_setter.set_auto_commands()
-  augroup fclojure-answer-column-buffer
-    autocmd! * <buffer>
-    autocmd BufWriteCmd <buffer>
-          \ call s:write_answer(b:fclojure_problem_no, getline(1, '$')) |
-          \ setlocal nomodified
-  augroup END
-endfunction
 "}}}
 
-function! s:read_answer(problem_no)"{{{
-  return readfile(s:get_answer_file_path(a:problem_no))
-endfunction
-"}}}
-
-function! s:write_answer(problem_no, lines)"{{{
-  let answer_dir = fclojure#core#get_answer_dir_path()
+function! s:create_answer_dir()"{{{
+  let answer_dir = fclojure#option#get('answer_dir')
   if !isdirectory(answer_dir)
     call mkdir(answer_dir, 'p')
   endif
-  call writefile(a:lines, s:get_answer_file_path(a:problem_no))
 endfunction
 "}}}
 
 function! s:get_answer_file_path(problem_no)"{{{
-  return printf("%s/%03d.clj", fclojure#core#get_answer_dir_path(), a:problem_no)
+  return s:F.join(fclojure#option#get('answer_dir'),
+        \         printf('%03d.clj', a:problem_no))
 endfunction
 "}}}
 
