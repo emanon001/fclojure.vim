@@ -89,6 +89,8 @@ function! s:init_options() " {{{2
   call s:set_option('answer_dir',
         \ s:get_full_path(get(user_option_table, 'answer_dir',
         \                     s:F.join(fclojure#option#get('data_dir'), 'answers'))))
+  call s:set_option('answer_file_format',
+        \ get(user_option_table, 'answer_file_format', '%03d.clj'))
   call s:set_option('open_buffer_command',
         \ get(user_option_table, 'open_buffer_command', 'split'))
   call s:set_option('no_default_key_mappings',

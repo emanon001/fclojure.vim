@@ -258,7 +258,7 @@ endfunction
 
 function! s:get_answer_file_path(problem_no)"{{{
   return s:F.join(fclojure#option#get('answer_dir'),
-        \         printf('%03d.clj', a:problem_no))
+        \         printf(fclojure#option#get('answer_file_format'), a:problem_no))
 endfunction
 "}}}
 
