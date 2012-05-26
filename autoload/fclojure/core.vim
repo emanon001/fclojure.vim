@@ -78,7 +78,7 @@ let s:curl_command = fclojure#option#get('curl_command')
 function! fclojure#core#get_problem_list(use_cache) " {{{2
   " Use the cache."{{{
   if a:use_cache && !empty(s:problem_list)
-    return s:problem_list
+    return copy(s:problem_list)
   endif
   "}}}
   " Check the log in."{{{
@@ -92,14 +92,14 @@ function! fclojure#core#get_problem_list(use_cache) " {{{2
   let response = s:H.get(url, {}, header)
   let problem_list = fclojure#parser#parse_problem_list(response)
   let s:problem_list = problem_list
-  return problem_list
+  return copy(problem_list)
 endfunction
 
 
 function! fclojure#core#get_problem(problem_no, use_cache) " {{{2
   " Use cache."{{{
   if a:use_cache && has_key(s:problem_detail_table, a:problem_no)
-    return s:problem_detail_table[a:problem_no]
+    return copy(s:problem_detail_table[a:problem_no])
   endif
   "}}}
   " Check the log in."{{{
@@ -113,7 +113,7 @@ function! fclojure#core#get_problem(problem_no, use_cache) " {{{2
   let response = s:H.get(url, {}, header)
   let problem = fclojure#parser#parse_problem(response)
   let s:problem_detail_table[a:problem_no] = problem
-  return problem
+  return copy(problem)
 endfunction
 
 
@@ -148,8 +148,6 @@ endfunction
 function! fclojure#core#get_cache_dir_path() " {{{2
   return s:get_file_path('cache_dir')
 endfunction
-
-
 
 
 function! fclojure#core#get_top_url() " {{{2
