@@ -106,22 +106,6 @@ nnoremap <silent> <Plug>(fclojure-solve-problem-by-a-block)
 nnoremap <silent> <Plug>(fclojure-quit-answer-column)
       \ :<C-u>quit<CR>
 
-function! s:get_a_block()"{{{
-  let pos = getpos(".")
-  silent normal! yab
-  let [r_, r_t] = [@@, getregtype('"')]
-  let [r0, r0t] = [@0, getregtype('0')]
-
-  let block = @@
-
-  call setreg('"', r_, r_t)
-  call setreg('0', r0, r0t)
-  call setpos(".", pos)
-
-  return block
-endfunction
-"}}}
-
 
 " Signs {{{2
 
@@ -396,6 +380,50 @@ endfunction
 function! s:sid() " {{{2
   return printf('<SNR>%d_', s:snr())
 endfunction
+
+
+function! s:get_a_block() "{{{2
+  let pos = getpos(".")
+  silent! normal! yab
+  let [r_, r_t] = [@@, getregtype('"')]
+  let [r0, r0t] = [@0, getregtype('0')]
+
+  let block = @@
+
+  call setreg('"', r_, r_t)
+  call setreg('0', r0, r0t)
+  call setpos(".", pos)
+
+  return s:align_indent(block)
+endfunction
+
+let s:align_indent_bufnr = -1
+
+function! s:align_indent(src)"{{{
+  if bufexists(s:align_indent_bufnr)
+    call s:move_to_buffer(s:align_indent_bufnr)
+  else
+    call s:create_buffer('fclojure-align-indent', s:align_indent_setter)
+    let s:align_indent_bufnr = bufnr('%')
+  endif
+
+  silent! 1,$delete _
+  call setline(1, split(a:src, '\n'))
+  silent! normal! gg=G
+  quit
+
+  return join(getbufline(s:align_indent_bufnr, 1, '$'), "\n")
+endfunction
+"}}}
+
+" Align indent setter"{{{
+let s:align_indent_setter = {}
+
+function! s:align_indent_setter.set_options()
+  setlocal bufhidden=hide buftype=nofile noswapfile nobuflisted
+  setfiletype clojure
+endfunction
+"}}}
 
 
 
