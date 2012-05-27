@@ -312,6 +312,7 @@ endfunction
 function! s:callback_of_solve(problem_no, result) " {{{2
   let bufnr = get(get(s:problem_view_table, a:problem_no, {}), 'bufnr', -1)
   if !bufexists(bufnr) || bufwinnr(bufnr) == -1
+    redraw!
     echohl WarningMsg | echo s:get_result_message(a:result) | echohl None
     return
   endif
