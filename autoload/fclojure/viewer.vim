@@ -97,7 +97,7 @@ nnoremap <silent> <Plug>(fclojure-quit-problem)
 nnoremap <silent> <Plug>(fclojure-open-problem-url)
       \ :<C-u>call fclojure#open_problem_url(b:fclojure_problem_no)<CR>
 
-nnoremap <silent> <Plug>(fclojure-solve-problem-by-answer-column)
+nnoremap <silent> <Plug>(fclojure-solve-problem-by-buffer)
       \ :<C-u>call fclojure#solve_problem(b:fclojure_problem_no, join(getline(1, '$'), "\n"))<CR>
 
 nnoremap <silent> <Plug>(fclojure-solve-problem-by-a-block)
@@ -261,7 +261,7 @@ function! s:answer_setter.set_options()
 endfunction
 
 function! s:answer_setter.set_key_mappings()
-  nmap <buffer> <LocalLeader>s <Plug>(fclojure-solve-problem-by-answer-column)
+  nmap <buffer> <LocalLeader>s <Plug>(fclojure-solve-problem-by-buffer)
   nmap <buffer> <LocalLeader>b <Plug>(fclojure-solve-problem-by-a-block)
   nmap <buffer> q <Plug>(fclojure-quit-answer-column)
 endfunction
