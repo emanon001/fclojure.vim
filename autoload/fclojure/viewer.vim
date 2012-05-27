@@ -352,7 +352,7 @@ function! s:set_result_message_in_problem_buffer(problem_no, result)"{{{
   let lines += fclojure#util#split_by_length(message, s:MAX_LINE_LENGTH)
   let lines += [repeat('*', s:MAX_LINE_LENGTH)]
   setlocal modifiable noreadonly
-  silent! 1,$delete
+  silent! 1,$delete _
   call setline(1, lines)
   setlocal nomodifiable readonly
   silent! wincmd p
