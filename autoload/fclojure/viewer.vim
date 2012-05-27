@@ -100,8 +100,27 @@ nnoremap <silent> <Plug>(fclojure-open-problem-url)
 nnoremap <silent> <Plug>(fclojure-solve-problem-by-answer-column)
       \ :<C-u>call fclojure#solve_problem(b:fclojure_problem_no, join(getline(1, '$'), "\n"))<CR>
 
+nnoremap <silent> <Plug>(fclojure-solve-problem-by-a-block)
+      \ :<C-u>call fclojure#solve_problem(b:fclojure_problem_no, <SID>get_a_block())<CR>
+
 nnoremap <silent> <Plug>(fclojure-quit-answer-column)
       \ :<C-u>quit<CR>
+
+function! s:get_a_block()"{{{
+  let pos = getpos(".")
+  silent normal! yab
+  let [r_, r_t] = [@@, getregtype('"')]
+  let [r0, r0t] = [@0, getregtype('0')]
+
+  let block = @@
+
+  call setreg('"', r_, r_t)
+  call setreg('0', r0, r0t)
+  call setpos(".", pos)
+
+  return block
+endfunction
+"}}}
 
 
 " Signs {{{2
@@ -243,6 +262,7 @@ endfunction
 
 function! s:answer_setter.set_key_mappings()
   nmap <buffer> <LocalLeader>s <Plug>(fclojure-solve-problem-by-answer-column)
+  nmap <buffer> <LocalLeader>b <Plug>(fclojure-solve-problem-by-a-block)
   nmap <buffer> q <Plug>(fclojure-quit-answer-column)
 endfunction
 
