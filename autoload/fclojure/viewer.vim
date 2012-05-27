@@ -271,7 +271,7 @@ function! s:create_buffer(bufname, setter) " {{{2
   let setter = extend(s:default_setter, a:setter)
   let open_command = fclojure#option#get('open_buffer_command')
   execute open_command
-  edit `=a:bufname`
+  silent! edit `=a:bufname`
   call setter.set_options()
   call setter.set_auto_commands()
   if s:use_default_key_mappings_p()
@@ -302,7 +302,7 @@ function! s:move_to_buffer(bufnr) " {{{2
   if winnr == -1
     let open_command = fclojure#option#get('open_buffer_command')
     execute open_command
-    execute a:bufnr . 'buffer'
+    silent! execute a:bufnr . 'buffer'
   else
     execute winnr . 'wincmd w'
   endif
