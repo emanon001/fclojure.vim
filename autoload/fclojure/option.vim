@@ -92,7 +92,7 @@ function! s:init_options() " {{{2
   call s:set_option('answer_file_format',
         \ get(user_option_table, 'answer_file_format', '%03d.clj'))
   call s:set_option('open_buffer_command',
-        \ get(user_option_table, 'open_buffer_command', 'split'))
+        \ get(user_option_table, 'open_buffer_command', 'belowright split'))
   call s:set_option('no_default_key_mappings',
         \ get(user_option_table, 'no_default_key_mappings', s:FALSE))
   call s:set_option('open_url_command',
