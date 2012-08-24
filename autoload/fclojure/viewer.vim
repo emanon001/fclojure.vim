@@ -385,14 +385,13 @@ endfunction
 
 function! s:get_a_block() "{{{2
   let pos = getpos(".")
-  silent! normal! yab
   let [r_, r_t] = [@@, getregtype('"')]
-  let [r0, r0t] = [@0, getregtype('0')]
+
+  silent! normal! yab
 
   let block = @@
 
   call setreg('"', r_, r_t)
-  call setreg('0', r0, r0t)
   call setpos(".", pos)
 
   return s:align_indent(block)
