@@ -245,8 +245,8 @@ function! s:answer_setter.set_options()
 endfunction
 
 function! s:answer_setter.set_key_mappings()
-  nmap <buffer> <LocalLeader>s <Plug>(fclojure-solve-problem-with-file)
-  nmap <buffer> <LocalLeader>b <Plug>(fclojure-solve-problem-with-a-block)
+  nmap <buffer> <LocalLeader>sf <Plug>(fclojure-solve-problem-with-file)
+  nmap <buffer> <LocalLeader>sb <Plug>(fclojure-solve-problem-with-a-block)
   nmap <buffer> q <Plug>(fclojure-quit-answer-column)
 endfunction
 
