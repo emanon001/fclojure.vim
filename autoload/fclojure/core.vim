@@ -241,7 +241,7 @@ function! s:log_in_by_user_input() " {{{2
   "       *log-in url* response is required.
   let command = printf('%s %s -s -k -i -d user=%s -d pwd=%s -c "%s"',
         \              s:curl_command, fclojure#core#get_log_in_url(),
-        \              user_name, password,
+        \              shellescape(user_name), shellescape(password),
         \              escape(fclojure#core#get_cookie_file_path(), '"'))
   " Response is only a header.
   let header = s:V.system(command)
